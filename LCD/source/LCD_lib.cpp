@@ -73,7 +73,6 @@ void disp_str(const char str[]){
     if(str[i] != '\n') disp_char(str[i]);
     i++;
   }
-  move_line();
 
   printf("%s\n\n",str);
 }

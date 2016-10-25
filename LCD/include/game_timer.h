@@ -1,8 +1,6 @@
 #ifndef _INCLUDE_GAME_TIMER_
 #define _INCLUDE_GAME_TIMER_
 
-#define TIME_LIMIT 180
-
 class GameTimer{ 
   
  public:
@@ -11,12 +9,14 @@ class GameTimer{
   void init(const int time_limit);
   void tick_timer();
   void disp_timer();
+  int get_time();
+  bool is_timeout();
 
  private:
   int time;
-  char minute;
-  char tens_sec;
-  char ones_sec;
+  int minute;
+  int tens_sec;
+  int ones_sec;
 };
 
 #endif

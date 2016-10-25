@@ -6,6 +6,7 @@
 #include "game_timer.h"
 #include "niusb6501.h"
 
+#define TIME_LIMIT 5
 #define START_DATA 0x01
 #define GOAL_DATA 0x02
 #define NAME_LENGTH 17
@@ -17,24 +18,23 @@ typedef struct {
   int score;
 }score_t;
 
-int is_start(void);
-int is_goal(void);
+bool is_start(void);
+bool is_goal(void);
 void disp_high_score(const score_t *high_score); 
 void load_high_score(score_t *high_score);
 void save_high_score(const score_t *high_score);
 
 int main(void){  
-  gameTimer_t timer;
+  GameTimer game_timer = GameTimer(TIME_LIMIT);
   score_t high_score;
-  int goal_flg = 0;
+  bool goal_flg = false;
 
   init_LCD();
   
   while(1){
     
-    //puts("task start");
     clear_display();
-    init_timer(&timer);
+    game_timer.init(TIME_LIMIT);
     goal_flg = 0;
     load_high_score(&high_score);
 
@@ -42,17 +42,16 @@ int main(void){
     while(!is_start());
     clear_display(); 
 
-    while(timer.timer >= 0 && !goal_flg){
-      tick_timer(&timer);
+    while(!(game_timer.is_timeout()) && !(goal_flg)){
+      game_timer.tick_timer();
       goal_flg = is_goal();
-      
     }
 
     clear_display();
 
     if(goal_flg){
-      if(timer.timer > high_score.score){
-	high_score.score = timer.timer;
+      if(game_timer.get_time() > high_score.score){
+	high_score.score = game_timer.get_time();
 	disp_str(" HIGH SCORE!!");
 	disp_str(" INPUT NAME");
 	printf("input your name->");
@@ -98,25 +97,25 @@ void save_high_score(const score_t *high_score){
   fclose(fp);
 }
 
-int is_start(void){
+bool is_start(void){
   char PIOC_dat;
     
   PIOC_dat = read_port(PIOC);
   printf("%x\r",PIOC_dat);
-  if((PIOC_dat & 0x03) == START_DATA) return 1;
+  if((PIOC_dat & 0x03) == START_DATA) return true;
 
-  return 0;
+  return false;
 }
   
-int is_goal(void){
+bool is_goal(void){
   char PIOC_dat;
     
   PIOC_dat = read_port(PIOC);
   printf("%x\r",PIOC_dat);
 
-  if((PIOC_dat & 0x03)  == GOAL_DATA) return 1;
+  if((PIOC_dat & 0x03)  == GOAL_DATA) return true;
 
-  return 0;
+  return false;
 }
 
 void disp_high_score(const score_t *high_score){
@@ -126,6 +125,7 @@ void disp_high_score(const score_t *high_score){
 
   clear_display();  
   disp_str(high_score->name);
+  move_line();
   disp_str(score);
 
   sleep(5);

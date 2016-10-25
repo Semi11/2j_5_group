@@ -1,8 +1,9 @@
 #include "LCD_lib.h"
 #include "game_timer.h"
 #include <unistd.h>
+#include <string>
 
-#define DELAY 5000
+#define DELAY 2500
 
 GameTimer::GameTimer(){
   init(180);
@@ -13,9 +14,6 @@ GameTimer::GameTimer(const int time_limit){
 }
 
 void GameTimer::init(const int time_limit){
-  // timer->minute = '3';
-  // timer->tens_sec = '0';
-  // timer->ones_sec = '0';
   time = time_limit;
   minute = time_limit / 60;
   tens_sec = time_limit % 60 /10;
@@ -27,17 +25,17 @@ void GameTimer::tick_timer(){
   cnt++;
 
   if(cnt > DELAY){
-    disp_timer(timer);
-    timer->timer--;
-    if(timer->tens_sec == '0' && timer->ones_sec == '0'){
-      timer->minute--;
-      timer->tens_sec = '5';
-      timer->ones_sec = '9';
-    }else if(timer->ones_sec == '0'){
-      timer->tens_sec--;
-      timer->ones_sec = '9';
+    disp_timer();
+    time--;
+    if((tens_sec == 0) && (ones_sec == 0)){
+      minute--;
+      tens_sec = 5;
+      ones_sec = 9;
+    }else if(ones_sec == 0){
+      tens_sec--;
+      ones_sec = 9;
     }else{
-      timer->ones_sec--;
+      ones_sec--;
     }
     cnt = 0;
   }
@@ -45,13 +43,22 @@ void GameTimer::tick_timer(){
   usleep(1);
 }
 
+int GameTimer::get_time(){
+  return time;
+}
+
+bool GameTimer::is_timeout(){
+  if(time < 0) return true;
+  return false;
+}
+
 void GameTimer::disp_timer(){
   clear_display();
   cursor_at_home();
       
-  disp_char(timer->minute);
+  disp_str(std::to_string(minute).c_str());
   disp_char(':');
-  disp_char(timer->tens_sec);
-  disp_char(timer->ones_sec);
+  disp_str(std::to_string(tens_sec).c_str());
+  disp_str(std::to_string(ones_sec).c_str());
 
 }
