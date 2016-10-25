@@ -3,8 +3,6 @@
 #include <unistd.h>
 #include <string>
 
-#define DELAY 2500
-
 GameTimer::GameTimer(){
   init(180);
 }
@@ -21,26 +19,21 @@ void GameTimer::init(const int time_limit){
 }
 
 void GameTimer::tick_timer(){
-  static int cnt = DELAY;
-  cnt++;
 
-  if(cnt > DELAY){
-    disp_timer();
-    time--;
-    if((tens_sec == 0) && (ones_sec == 0)){
-      minute--;
-      tens_sec = 5;
-      ones_sec = 9;
-    }else if(ones_sec == 0){
-      tens_sec--;
-      ones_sec = 9;
-    }else{
-      ones_sec--;
-    }
-    cnt = 0;
+  disp_timer();
+  time--;
+  if((tens_sec == 0) && (ones_sec == 0)){
+    minute--;
+    tens_sec = 5;
+    ones_sec = 9;
+  }else if(ones_sec == 0){
+    tens_sec--;
+    ones_sec = 9;
+  }else{
+    ones_sec--;
   }
   
-  usleep(1);
+  usleep(1000000);
 }
 
 int GameTimer::get_time(){
