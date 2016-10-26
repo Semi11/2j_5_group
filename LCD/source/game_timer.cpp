@@ -1,6 +1,5 @@
 #include "LCD_lib.h"
 #include "game_timer.h"
-#include <unistd.h>
 #include <string>
 
 GameTimer::GameTimer(){
@@ -16,11 +15,12 @@ void GameTimer::init(const int time_limit){
   minute = time_limit / 60;
   tens_sec = time_limit % 60 /10;
   ones_sec = time_limit % 60 %10;
+  tick_flg = true;
 }
 
-void GameTimer::tick_timer(){
-
-  disp_timer();
+void GameTimer::tick(){
+  if(!is_tick())return;
+  
   time--;
   if((tens_sec == 0) && (ones_sec == 0)){
     minute--;
@@ -32,8 +32,10 @@ void GameTimer::tick_timer(){
   }else{
     ones_sec--;
   }
-  
-  usleep(1000000);
+}
+
+void GameTimer::stop(){
+  tick_flg = false;
 }
 
 int GameTimer::get_time(){
@@ -45,13 +47,17 @@ bool GameTimer::is_timeout(){
   return false;
 }
 
-void GameTimer::disp_timer(){
-  clear_display();
+bool GameTimer::is_tick(){
+  return tick_flg;
+}
+
+void GameTimer::disp(){
+  //clear_display();
   cursor_at_home();
-      
+  
   disp_str(std::to_string(minute).c_str());
   disp_char(':');
   disp_str(std::to_string(tens_sec).c_str());
   disp_str(std::to_string(ones_sec).c_str());
-
+  
 }

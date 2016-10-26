@@ -1,6 +1,6 @@
 COMPILER  = g++
-CFLAGS    = -std=c++11 -g -MMD -MP -Wall -Winit-self -Wno-missing-field-initializers
-LDFLAGS   = -lusb
+CFLAGS    = -std=c++11 -pthread -g -MMD -MP -Wall -Winit-self -Wno-missing-field-initializers
+LDFLAGS   = -lusb -pthread
 LIBS      = /home/jugyou/common/NI_USB-6501/lib/niusb6501.o
 INCLUDE   = -I./include 
 TARGET    = ./$(shell basename `readlink -f .`)
