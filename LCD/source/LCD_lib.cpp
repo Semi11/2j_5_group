@@ -74,6 +74,6 @@ void disp_str(const char str[]){
     i++;
   }
 
-  printf("%s\n\n",str);
+  //printf("%s\n\n",str);
 }
 

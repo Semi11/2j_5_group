@@ -1,16 +1,25 @@
 #include <thread>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include "LCD_lib.h"
 #include "niusb6501.h"
 #include "game_main.h"
 #include <unistd.h>
+#include <assert.h>
 
 GameMain::GameMain(){
   init();
 }
 
 void GameMain::init(){
-  timer.init(TIME_LIMIT);
+  std::string time_limit_str = load_time_limit(TIME_LIMIT_DAT_FILE);
+  int time_limit;
+  
+  std::istringstream is(time_limit_str);
+  is >> time_limit;
+  timer.init(time_limit);
   high_score.load(HIGH_SCORE_DAT_FILE);
   goal_flg = false;
 }
@@ -49,10 +58,13 @@ void GameMain::process_goal(){
 
   if(timer.get_time() > high_score.get_score()){
     disp_str(" HIGH SCORE!!");
+    sleep(3);
+    clear_display();
     disp_str(" INPUT NAME");
     printf("input your name->");
     std::cin >> name;
     high_score.set(name, timer.get_time());
+    high_score.save(HIGH_SCORE_DAT_FILE);
   }else{
     disp_str(" GOAL!!");
     sleep(5);
@@ -68,7 +80,8 @@ bool GameMain::is_start(){
   char PIOC_dat;
     
   PIOC_dat = read_port(PIOC);
-  std::cout << std::hex << PIOC_dat << "\r";
+  //  std::cout << std::hex << PIOC_dat << "\r";
+  printf("%x\r",PIOC_dat);
   if((PIOC_dat & 0x03) == START_DATA) return true;
 
   return false;
@@ -83,4 +96,15 @@ bool GameMain::is_goal(){
   if((PIOC_dat & 0x03)  == GOAL_DATA) return true;
   
   return false;
+}
+
+std::string GameMain::load_time_limit(std::string file_name){
+  std::string buf;
+  
+  std::ifstream reading_file(file_name, std::ios::in);
+  assert(reading_file.is_open());
+  std::getline(reading_file, buf);
+  reading_file.close();
+
+  return buf;
 }
