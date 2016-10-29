@@ -55,6 +55,7 @@ void GameMain::run_timer(){
 
 void GameMain::process_goal(){
   std::string name;
+  Score score;
 
   if(timer.get_time() > high_score.get_score()){
     disp_str(" HIGH SCORE!!");
@@ -66,8 +67,17 @@ void GameMain::process_goal(){
     high_score.set(name, timer.get_time());
     high_score.save(HIGH_SCORE_DAT_FILE);
   }else{
+    score.set("YOUR SCORE", timer.get_time());
+
     disp_str(" GOAL!!");
     sleep(5);
+    clear_display();
+    score.disp();
+    sleep(5);
+    clear_display();
+    disp_str(" HIGH SCORE");
+    sleep(5);
+    clear_display();   
   }  
 }
 
